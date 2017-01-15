@@ -15,16 +15,16 @@ namespace VocabularyLearner
 
         private string path = Directory.GetCurrentDirectory();
 
-        private LinkedList<string> getLineList() {
+        private List<string> getLineList() {
             string line;
-            LinkedList<string> output = new LinkedList<string>();
+            List<string> output = new List<string>();
             // Read the file and display it line by line. 
             try
             {
                 System.IO.StreamReader file = new System.IO.StreamReader(@"wordbook.txt");
                 while ((line = file.ReadLine()) != null)
                 {
-                    output.AddLast(line);
+                    output.Add(line);
                 }
 
                 file.Close();
@@ -36,7 +36,7 @@ namespace VocabularyLearner
                 file.WriteLine("#Lines not it that format will be ignored");
                 file.WriteLine("#Lines not it that format will be marked with '>'");
                 file.WriteLine("#Lines started with # will be ignored");
-
+                file.WriteLine("&안년하세요<>&Hello");
 
                 file.Close();
             }
@@ -44,11 +44,11 @@ namespace VocabularyLearner
             return output;
         }
 
-        public LinkedList<Item> getItemList() {
-            LinkedList<string> input = getLineList();
+        public ResultList getItemList() {
+            List<string> input = getLineList();
 
 
-            LinkedList<Item> output = new LinkedList<Item>();
+            ResultList output = new ResultList();
             string[] arrLines = input.ToArray<string>();
             bool changedLine = false;
             //Translate input to Items
@@ -59,7 +59,7 @@ namespace VocabularyLearner
                 if (x.StartsWith("#") || x.StartsWith(">")|| x.StartsWith("DELETED")) continue;
                 if (validLine.IsMatch(x))
                 {
-                    output.AddLast(new Item(x));
+                    output.Add(new Item(x));
                 }
                 else
                 {
@@ -75,10 +75,10 @@ namespace VocabularyLearner
         }
 
         public bool removeItem(Item item) {
-            LinkedList<string> input = getLineList();
+            List<string> input = getLineList();
 
 
-            LinkedList<Item> output = new LinkedList<Item>();
+            List<Item> output = new List<Item>();
             string[] arrLines = input.ToArray<string>();
             bool changedLine = false;
             //Translate input to Items

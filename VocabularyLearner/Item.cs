@@ -10,13 +10,15 @@ namespace VocabularyLearner
 {
     class Item
     {
-        private LinkedList<string> validLanguageOne;
-        private LinkedList<string> validLanguageTwo;
+        private List<string> validLanguageOne;
+        private List<string> validLanguageTwo;
 
-        //Creates item from the custom format &wordone&wordtwo<>&wordInOtherLanguage&WordInOtherLanguage
+        private static Random random = new Random();
+
+        //Creates item from the custom format &wordone&wordtwo<>&wordInOtherLanguageone&WordInOtherLanguageone
         public Item(String x) {
-            validLanguageOne = new LinkedList<string>();
-            validLanguageTwo = new LinkedList<string>();
+            validLanguageOne = new List<string>();
+            validLanguageTwo = new List<string>();
             bool weRightNow = false;
             Regex validItem = new Regex("&[A-Za-z0-9가-힣 ]+");
             String nextValue = "";
@@ -25,13 +27,13 @@ namespace VocabularyLearner
                 if (x.ElementAt(i) == '\n')
                 {
                     if (nextValue == "") break;
-                    if (!weRightNow) validLanguageOne.AddLast(nextValue);
-                    else validLanguageTwo.AddLast(nextValue);
+                    if (!weRightNow) validLanguageOne.Add(nextValue);
+                    else validLanguageTwo.Add(nextValue);
                     break;
                 }
                 if (x.ElementAt(i) == '<' && x.ElementAt(i + 1) == '>')
                 {
-                    validLanguageOne.AddLast(nextValue);
+                    validLanguageOne.Add(nextValue);
                     nextValue = "";
                     weRightNow = true;
                     i++;
@@ -40,23 +42,46 @@ namespace VocabularyLearner
                 if (x.ElementAt(i) == '&')
                 {
                     if (nextValue == "") continue;
-                    if (!weRightNow) validLanguageOne.AddLast(nextValue);
-                    else validLanguageTwo.AddLast(nextValue);
+                    if (!weRightNow) validLanguageOne.Add(nextValue);
+                    else validLanguageTwo.Add(nextValue);
                     nextValue = "";
                     continue;
                 }
                 nextValue += x.ElementAt(i);
                 if (i == x.Length - 1) {
-                    if (!weRightNow) validLanguageOne.AddLast(nextValue);
-                    else validLanguageTwo.AddLast(nextValue);
+                    if (!weRightNow) validLanguageOne.Add(nextValue);
+                    else validLanguageTwo.Add(nextValue);
                 }
             }
+        }
+
+        public string stringOfallResults(bool languageOne) {
+            string output = "";
+            List<string> list;
+            if (languageOne) list = validLanguageTwo;
+            else list = validLanguageOne;
+            foreach (string x in list) {
+                output += x + " | ";
+            }
+
+            return output.Substring(0, output.Length - 2);
+
+        }
+
+        public bool isCorrect(bool languageOne, String input) {
+            if (languageOne) return validLanguageTwo.Contains(input);
+            else return validLanguageOne.Contains(input);
+        }
+
+        public String getToBeTranslated(bool languageOne) {
+            if (languageOne) return validLanguageOne.ElementAt(random.Next(validLanguageOne.Count));
+            else return validLanguageTwo.ElementAt(random.Next(validLanguageTwo.Count));
         }
         
 
         public void addWord(bool languageOne, string word) {
-            if (languageOne) validLanguageOne.AddFirst(word);
-            else validLanguageTwo.AddLast(word);
+            if (languageOne) validLanguageOne.Add(word);
+            else validLanguageTwo.Add(word);
         }
 
         override
