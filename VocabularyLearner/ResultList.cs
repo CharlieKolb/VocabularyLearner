@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace VocabularyLearner
 {
-    class ResultList : List<Item>
+    //A list implementation that additionally has a dictionary for its items for the random A-Z option
+    class ResultList : List<Item>   
     {
         public enum mode_ {
             AtoZ,
@@ -31,6 +33,7 @@ namespace VocabularyLearner
             random = new Random();
         }
 
+        //Returns the next item according to the current mode
         public Item getNext() {
             switch (mode)
             {
@@ -39,21 +42,29 @@ namespace VocabularyLearner
                     return this.ElementAt(current++);
                 case mode_.completeRandom:
                     int n = 0;
-                    while ((n = random.Next(0, Count - 1)) == lastUsed) continue;   //Find a position != lastUsed
+                    while ((n = random.Next(0, Count)) == lastUsed) continue;   //Find a position != lastUsed
                     lastUsed = n;
                     return this.ElementAt(n);
                 case mode_.randomIterate:
-                    int k = 0;
-                    while (usedThisCycle[this.ElementAt(k = random.Next(0, Count - 1))]) continue;   //Find a position != lastUsed
-                    usedThisCycle[this.ElementAt(k = random.Next(0, Count - 1))] = true;
-                    return this.ElementAt(k);
+                    Item k = null;
+                    if (!usedThisCycle.ContainsValue(false)) resetDictionary();
+                    while (usedThisCycle[k = usedThisCycle.ElementAt(random.Next(0, Count)).Key]) continue;   //Find an unused
+                    usedThisCycle[k] = true;
+                    return k;
             }
             return null;
         }
 
+        private void resetDictionary() {
+            Debug.WriteLine("AAA");
+            for (int i = 0; i < usedThisCycle.Count; i++) {
+                usedThisCycle[usedThisCycle.ElementAt(i).Key] = false;
+            }
+        }
+
         public void addItem(Item item) {
             this.Add(item);
-            usedThisCycle[item] = true;
+            usedThisCycle.Add(item, false);
             
         }
 

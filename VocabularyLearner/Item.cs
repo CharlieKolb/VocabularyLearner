@@ -68,9 +68,18 @@ namespace VocabularyLearner
 
         }
 
-        public bool isCorrect(bool languageOne, String input) {
-            if (languageOne) return validLanguageTwo.Contains(input);
-            else return validLanguageOne.Contains(input);
+        public bool isCorrect(String input,bool ignoreCasing,bool languageOne) {
+            List<string> list;
+            if (languageOne) list = validLanguageTwo;
+            else list = validLanguageOne;
+
+            //
+            foreach (string x in list)
+            {
+                if ((ignoreCasing && x.ToLower().Equals(input.ToLower()))) return true; 
+                else if (x.Equals(input)) return true;
+            }
+            return list.Contains(input);
         }
 
         public String getToBeTranslated(bool languageOne) {

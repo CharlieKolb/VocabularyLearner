@@ -33,7 +33,6 @@ namespace VocabularyLearner
         }
 
         public bool doDraw() {
-            Debug.WriteLine(draw);
             return draw;
         }
 

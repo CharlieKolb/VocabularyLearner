@@ -34,13 +34,17 @@ namespace VocabularyLearner
         }
 
         private bool AtoB = true;
+        private bool ignoreCasing = false;
 
         private mode_ mode = mode_.AtoB;    //Directs the translation direction, A->B, B->A or random
 
         private state_ state = state_.waitingForSolution;
 
         private TextBox inputBox = new TextBox();
+        private ComboBox directionBox = new ComboBox();
         private ComboBox shuffleBox = new ComboBox();
+        private CheckBox caseButton = new CheckBox();
+
 
 
         private Graphics formGraphics;
@@ -65,12 +69,7 @@ namespace VocabularyLearner
             BringToFront();
 
             //Loads the items read into the program by the FileHandler
-            items = (new FileHandler()).getItemList();
-            Debug.WriteLine(items.Count);
-            foreach (Item item in items)
-            {
-                Debug.WriteLine(item.ToString());
-            }
+            items = FileHandler.getItemList();
             current = items.getNext();
 
             //Initialize the different drawing subjects
@@ -84,25 +83,48 @@ namespace VocabularyLearner
             drawables[Drawable.result] = new Drawable(new Point(230, 300));
 
 
-            //Dropdown menu to select the Direction of the questions
-            shuffleBox.SetBounds(600, 100, 70, 10);
+            //Dropdown menu to select the direction of the questions
+            directionBox.SetBounds(600, 100, 100, 10);
+            directionBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            directionBox.Name = "Direction";
+            directionBox.DataSource = new string[]{"A -> B", "B -> A", "Random"};
+            directionBox.DropDownClosed += DirectionBox_DropDownClosed;
+
+            //Dropdown menu to select the order of the questions
+            shuffleBox.SetBounds(600, 200, 100, 10);
             shuffleBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            shuffleBox.Name = "Direction";
-            shuffleBox.DataSource = new string[]{"A -> B", "B -> A", "Random"};
+            shuffleBox.Name = "Shuffle";
+            shuffleBox.DataSource = new string[] { "In order", "Truly random", "Random A-Z"};
             shuffleBox.DropDownClosed += ShuffleBox_DropDownClosed;
+
+            caseButton.SetBounds(600, 300, 200, 30);
+            caseButton.Text = "Ignore upper/lower case";
+            caseButton.CheckedChanged += CaseButton_CheckedChanged;
+
+            Controls.Add(directionBox);
             Controls.Add(shuffleBox);
-           
+            Controls.Add(caseButton);
 
             Application.Run(this);
         }
 
+        private void CaseButton_CheckedChanged(object sender, EventArgs e)
+        {
+            ignoreCasing = caseButton.Checked;
+        }
+
         private void ShuffleBox_DropDownClosed(object sender, EventArgs e)
         {
-            if (shuffleBox.SelectedIndex == 0) mode = mode_.AtoB;//A->B
+            if (shuffleBox.SelectedIndex == 0) ResultList.setMode(ResultList.mode_.AtoZ);//In order
+            else if (shuffleBox.SelectedIndex == 1) ResultList.setMode(ResultList.mode_.completeRandom);//random
+            else if (shuffleBox.SelectedIndex == 2) ResultList.setMode(ResultList.mode_.randomIterate);//random A-Z
+        }
 
-            else if (shuffleBox.SelectedIndex == 1) mode = mode_.BtoA;//A->B
-
-            else if (shuffleBox.SelectedIndex == 2) mode = mode_.RtoR;//A->B
+        private void DirectionBox_DropDownClosed(object sender, EventArgs e)
+        {
+            if (directionBox.SelectedIndex == 0) mode = mode_.AtoB;//A->B
+            else if (directionBox.SelectedIndex == 1) mode = mode_.BtoA;//A->B
+            else if (directionBox.SelectedIndex == 2) mode = mode_.RtoR;//A->B
            
         }
 
@@ -118,7 +140,7 @@ namespace VocabularyLearner
                 switch (state) {
                     //User has put in a solution -> Result
                     case state_.waitingForSolution:
-                        bool isCorrect = current.isCorrect(AtoB, inputBox.Text);
+                        bool isCorrect = current.isCorrect(inputBox.Text, ignoreCasing, AtoB);
                         if (isCorrect) drawables[Drawable.result].setText("Correct!");
                         else drawables[Drawable.result].setText("Wrong!");
                         drawables[Drawable.result].setDraw(true);

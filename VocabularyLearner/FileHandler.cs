@@ -9,13 +9,13 @@ using System.Diagnostics;
 
 namespace VocabularyLearner
 {
-    class FileHandler
+    static class FileHandler
     {
         
 
-        private string path = Directory.GetCurrentDirectory();
+        private static string path = Directory.GetCurrentDirectory();
 
-        private List<string> getLineList() {
+        private static List<string> getLineList() {
             string line;
             List<string> output = new List<string>();
             // Read the file and display it line by line. 
@@ -44,7 +44,7 @@ namespace VocabularyLearner
             return output;
         }
 
-        public ResultList getItemList() {
+        public static ResultList getItemList() {
             List<string> input = getLineList();
 
 
@@ -59,7 +59,7 @@ namespace VocabularyLearner
                 if (x.StartsWith("#") || x.StartsWith(">")|| x.StartsWith("DELETED")) continue;
                 if (validLine.IsMatch(x))
                 {
-                    output.Add(new Item(x));
+                    output.addItem(new Item(x));
                 }
                 else
                 {
@@ -74,7 +74,7 @@ namespace VocabularyLearner
             return output;
         }
 
-        public bool removeItem(Item item) {
+        public static bool removeItem(Item item) {
             List<string> input = getLineList();
 
 
@@ -98,11 +98,6 @@ namespace VocabularyLearner
             }
             if (changedLine) File.WriteAllLines(@"wordbook.txt", arrLines);
             return changedLine;
-        }
-
-        private Item createItem(string x) {
-
-            return new Item(x);
         }
     }
 }
