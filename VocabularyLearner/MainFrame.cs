@@ -49,7 +49,7 @@ namespace VocabularyLearner
 
         private Graphics formGraphics;
 
-        private Font font = new Font(new FontFamily("Arial"), 16, FontStyle.Regular, GraphicsUnit.Pixel);
+        private Font font;
 
         private Brush solidBrush = new SolidBrush(Color.FromArgb(255, 0, 0, 0));
 
@@ -61,11 +61,17 @@ namespace VocabularyLearner
         {
             SetBounds(300, 400, 1200, 600);
             formGraphics = CreateGraphics();
+
+            PrivateFontCollection modernFont = new PrivateFontCollection();
+            modernFont.AddFontFile("NanumGothic.ttf");
+
+            font = new Font(modernFont.Families[0], 18);
             
             //Adds the TextBox for the User Input
-            inputBox.SetBounds(230, 200, 200, 30);
+            inputBox.SetBounds(230, 200, 300, 30);
             Controls.Add(inputBox);
             inputBox.KeyPress += Box_KeyPress;
+            inputBox.Font = font;
             BringToFront();
 
             //Loads the items read into the program by the FileHandler
@@ -74,10 +80,10 @@ namespace VocabularyLearner
 
             //Initialize the different drawing subjects
             drawables[Drawable.headline] = new Drawable("Translator-Test Press Enter to proceed", new Point(10, 10));
-            drawables[Drawable.textOne] = new Drawable("Please translate: ", new Point(70, 170));
+            drawables[Drawable.textOne] = new Drawable("Please translate: ", new Point(5, 170));
             drawables[Drawable.toBeTranslated] = new Drawable(current.getToBeTranslated(AtoB), new Point(227, 170));
-            drawables[Drawable.solution] = new Drawable(current.stringOfallResults(AtoB), new Point(227, 230));
-            drawables[Drawable.textTwo] = new Drawable("Possible solutions:", new Point(70, 230));
+            drawables[Drawable.solution] = new Drawable(current.stringOfallResults(AtoB), new Point(227, 240));
+            drawables[Drawable.textTwo] = new Drawable("Possible solutions:", new Point(5, 240));
             drawables[Drawable.solution].setDraw(false);
             drawables[Drawable.textTwo].setDraw(false);
             drawables[Drawable.result] = new Drawable(new Point(230, 300));
