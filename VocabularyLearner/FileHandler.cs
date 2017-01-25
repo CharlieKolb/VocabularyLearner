@@ -36,7 +36,7 @@ namespace VocabularyLearner
                 file.WriteLine("#Lines not it that format will be ignored");
                 file.WriteLine("#Lines not it that format will be marked with '>'");
                 file.WriteLine("#Lines started with # will be ignored");
-                file.WriteLine("&안년하세요<>&Hello");
+                file.WriteLine("#To ignore multiple lines, write #ignore above the the first line and #EndIgnore below the last one");
 
                 file.Close();
             }
@@ -52,10 +52,20 @@ namespace VocabularyLearner
             string[] arrLines = input.ToArray<string>();
             bool changedLine = false;
             //Translate input to Items
-            Regex validLine = new Regex("(&[A-Za-z0-9가-힣 ]+)+<>(&[A-Za-z0-9가-힣 ]+)+");
+            Regex validLine = new Regex("(&[A-Za-z0-9가-힣!?,. ]+)+<>(&[A-Za-z0-9가-힣!?,. ]+)+");
+            bool ignore = false;
             for(int i = 0; i < arrLines.Length; i++) {
                 String x = arrLines[i];
-
+                if (x.StartsWith("#ignore"))
+                {
+                    ignore = true;
+                    continue;
+                }
+                if (x.StartsWith("#endIgnore")) {
+                    ignore = false;
+                    continue;
+                }
+                if (ignore) continue;
                 if (x.StartsWith("#") || x.StartsWith(">")|| x.StartsWith("DELETED")) continue;
                 if (validLine.IsMatch(x))
                 {
