@@ -65,7 +65,14 @@ namespace VocabularyLearner
                     ignore = false;
                     continue;
                 }
+                if (x.StartsWith("#only")) {
+                    output.Clear();
+                    continue;
+                }
+                if (x.StartsWith("#endOnly")) break;
+                
                 if (ignore) continue;
+                
                 if (x.StartsWith("#") || x.StartsWith(">")|| x.StartsWith("DELETED")) continue;
                 if (validLine.IsMatch(x))
                 {
@@ -92,7 +99,7 @@ namespace VocabularyLearner
             string[] arrLines = input.ToArray<string>();
             bool changedLine = false;
             //Translate input to Items
-            Regex validLine = new Regex("(&[A-Za-z0-9가-힣 ]+)+<>(&[A-Za-z0-9가-힣 ]+)+");
+            Regex validLine = new Regex("(&[A-Za-z0-9가-힣!?,. ]+)+<>(&[A-Za-z0-9가-힣!?,. ]+)+");
             for (int i = 0; i < arrLines.Length; i++)
             {
                 String x = arrLines[i];
