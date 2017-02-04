@@ -56,16 +56,20 @@ namespace VocabularyLearner
         }
 
         private void resetDictionary() {
-            Debug.WriteLine("AAA");
             for (int i = 0; i < usedThisCycle.Count; i++) {
                 usedThisCycle[usedThisCycle.ElementAt(i).Key] = false;
             }
         }
 
         public void addItem(Item item) {
-            this.Add(item);
+            Add(item);
             usedThisCycle.Add(item, false);
             
+        }
+
+        public void clearItems() {
+            Clear(); //Deleted items in the List itself
+            usedThisCycle.Clear(); //Deletes items in the lookup-directory used in the mode_.randomIterate mode
         }
 
         public static void setMode(mode_ mode) {

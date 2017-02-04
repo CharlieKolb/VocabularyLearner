@@ -66,7 +66,7 @@ namespace VocabularyLearner
                     continue;
                 }
                 if (x.StartsWith("#only")) {
-                    output.Clear();
+                    output.clearItems();
                     continue;
                 }
                 if (x.StartsWith("#endOnly")) break;
