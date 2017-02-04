@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Delay.cs" />
     <Compile Include="Drawable.cs" />
     <Compile Include="FileHandler.cs" />
     <Compile Include="Item.cs" />

@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Threading;
 
 namespace VocabularyLearner
 {
@@ -33,6 +34,8 @@ namespace VocabularyLearner
 
         }
 
+        private Delay enterDelay = new Delay();
+
         private bool AtoB = true;
         private bool ignoreCasing = false;
 
@@ -44,8 +47,6 @@ namespace VocabularyLearner
         private ComboBox directionBox = new ComboBox();
         private ComboBox shuffleBox = new ComboBox();
         private CheckBox caseButton = new CheckBox();
-
-
 
         private Graphics formGraphics;
 
@@ -141,7 +142,7 @@ namespace VocabularyLearner
 
         private void Box_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char)13) //Enter-Taste
+            if (e.KeyChar == (char)13 && enterDelay.go()) //Enter-Key und possible Delay
             {
                 switch (state) {
                     //User has put in a solution -> Result
@@ -153,6 +154,8 @@ namespace VocabularyLearner
                         drawables[Drawable.solution].setDraw(true);
                         drawables[Drawable.textTwo].setDraw(true);
                         state = state_.waitingForContinue;
+                        (new Thread(enterDelay.delayInput)).Start(400); //Sets enterDelay.acceptInput to false for 400 millis to protect the user from revealing the solution immidiately
+
                         break;
                     //User pushed continue -> Generate new word
                     case state_.waitingForContinue:
@@ -173,6 +176,7 @@ namespace VocabularyLearner
                 }
                 e.Handled = true;
                 InvokePaint(this, new PaintEventArgs(formGraphics, DisplayRectangle));
+
 
             }
         }
@@ -207,6 +211,6 @@ namespace VocabularyLearner
             formGraphics.DrawString(drawable.text, font, solidBrush, drawable.location);
         }
 
-
+        
     }
 }
