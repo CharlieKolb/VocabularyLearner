@@ -45,7 +45,7 @@ namespace VocabularyLearner
         private ComboBox shuffleBox = new ComboBox();
         private CheckBox caseButton = new CheckBox();
 
-
+        private Button editButton = new Button();
 
         private Graphics formGraphics;
 
@@ -59,8 +59,10 @@ namespace VocabularyLearner
 
         public MainFrame()
         {
-            SetBounds(300, 400, 1200, 600);
+            SetBounds(300, 400, 600, 400);
             formGraphics = CreateGraphics();
+
+            this.Text = "Vocabulary Training";
             
             //Adds the TextBox for the User Input
             inputBox.SetBounds(230, 200, 200, 30);
@@ -84,28 +86,42 @@ namespace VocabularyLearner
 
 
             //Dropdown menu to select the direction of the questions
-            directionBox.SetBounds(600, 100, 100, 10);
+            directionBox.SetBounds(456, 30, 100, 10);
             directionBox.DropDownStyle = ComboBoxStyle.DropDownList;
             directionBox.Name = "Direction";
             directionBox.DataSource = new string[]{"A -> B", "B -> A", "Random"};
             directionBox.DropDownClosed += DirectionBox_DropDownClosed;
 
             //Dropdown menu to select the order of the questions
-            shuffleBox.SetBounds(600, 200, 100, 10);
+            shuffleBox.SetBounds(456, 60, 100, 10);
             shuffleBox.DropDownStyle = ComboBoxStyle.DropDownList;
             shuffleBox.Name = "Shuffle";
             shuffleBox.DataSource = new string[] { "In order", "Truly random", "Random A-Z"};
             shuffleBox.DropDownClosed += ShuffleBox_DropDownClosed;
 
-            caseButton.SetBounds(600, 300, 200, 30);
+            //Checkbox for lower case handling
+            caseButton.SetBounds(400, 90, 152, 30);
             caseButton.Text = "Ignore upper/lower case";
             caseButton.CheckedChanged += CaseButton_CheckedChanged;
+            caseButton.CheckAlign = ContentAlignment.MiddleRight;
+            caseButton.Checked = true;
+
+            //Button to the edit menu
+            editButton.Text = "Edit Wordpool";
+            editButton.SetBounds(10, 300, 70, 20);
+            editButton.Click += EditButton_Click;
 
             Controls.Add(directionBox);
             Controls.Add(shuffleBox);
             Controls.Add(caseButton);
+            Controls.Add(editButton);
 
             Application.Run(this);
+        }
+
+        private void EditButton_Click(object sender, EventArgs e)
+        {
+            new EditFrame(items).ShowDialog();
         }
 
         private void CaseButton_CheckedChanged(object sender, EventArgs e)

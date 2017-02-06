@@ -50,6 +50,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Drawable.cs" />
+    <Compile Include="EditFrame.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FileHandler.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="MainFrame.cs">
