@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Threading;
 
 namespace VocabularyLearner
 {
@@ -33,6 +34,8 @@ namespace VocabularyLearner
 
         }
 
+        private Delay enterDelay = new Delay();
+
         private bool AtoB = true;
         private bool ignoreCasing = false;
 
@@ -45,11 +48,9 @@ namespace VocabularyLearner
         private ComboBox shuffleBox = new ComboBox();
         private CheckBox caseButton = new CheckBox();
 
-        private Button editButton = new Button();
-
         private Graphics formGraphics;
 
-        private Font font = new Font(new FontFamily("Arial"), 16, FontStyle.Regular, GraphicsUnit.Pixel);
+        private Font font;
 
         private Brush solidBrush = new SolidBrush(Color.FromArgb(255, 0, 0, 0));
 
@@ -59,15 +60,19 @@ namespace VocabularyLearner
 
         public MainFrame()
         {
-            SetBounds(300, 400, 600, 400);
+            SetBounds(300, 400, 1200, 600);
             formGraphics = CreateGraphics();
 
-            this.Text = "Vocabulary Training";
+            PrivateFontCollection modernFont = new PrivateFontCollection();
+            modernFont.AddFontFile("NanumGothic.ttf");
+
+            font = new Font(modernFont.Families[0], 18);
             
             //Adds the TextBox for the User Input
-            inputBox.SetBounds(230, 200, 200, 30);
+            inputBox.SetBounds(230, 200, 300, 30);
             Controls.Add(inputBox);
             inputBox.KeyPress += Box_KeyPress;
+            inputBox.Font = font;
             BringToFront();
 
             //Loads the items read into the program by the FileHandler
@@ -76,52 +81,38 @@ namespace VocabularyLearner
 
             //Initialize the different drawing subjects
             drawables[Drawable.headline] = new Drawable("Translator-Test Press Enter to proceed", new Point(10, 10));
-            drawables[Drawable.textOne] = new Drawable("Please translate: ", new Point(70, 170));
+            drawables[Drawable.textOne] = new Drawable("Please translate: ", new Point(5, 170));
             drawables[Drawable.toBeTranslated] = new Drawable(current.getToBeTranslated(AtoB), new Point(227, 170));
-            drawables[Drawable.solution] = new Drawable(current.stringOfallResults(AtoB), new Point(227, 230));
-            drawables[Drawable.textTwo] = new Drawable("Possible solutions:", new Point(70, 230));
+            drawables[Drawable.solution] = new Drawable(current.stringOfallResults(AtoB), new Point(227, 240));
+            drawables[Drawable.textTwo] = new Drawable("Possible solutions:", new Point(5, 240));
             drawables[Drawable.solution].setDraw(false);
             drawables[Drawable.textTwo].setDraw(false);
             drawables[Drawable.result] = new Drawable(new Point(230, 300));
 
 
             //Dropdown menu to select the direction of the questions
-            directionBox.SetBounds(456, 30, 100, 10);
+            directionBox.SetBounds(600, 100, 100, 10);
             directionBox.DropDownStyle = ComboBoxStyle.DropDownList;
             directionBox.Name = "Direction";
             directionBox.DataSource = new string[]{"A -> B", "B -> A", "Random"};
             directionBox.DropDownClosed += DirectionBox_DropDownClosed;
 
             //Dropdown menu to select the order of the questions
-            shuffleBox.SetBounds(456, 60, 100, 10);
+            shuffleBox.SetBounds(600, 200, 100, 10);
             shuffleBox.DropDownStyle = ComboBoxStyle.DropDownList;
             shuffleBox.Name = "Shuffle";
             shuffleBox.DataSource = new string[] { "In order", "Truly random", "Random A-Z"};
             shuffleBox.DropDownClosed += ShuffleBox_DropDownClosed;
 
-            //Checkbox for lower case handling
-            caseButton.SetBounds(400, 90, 152, 30);
+            caseButton.SetBounds(600, 300, 200, 30);
             caseButton.Text = "Ignore upper/lower case";
             caseButton.CheckedChanged += CaseButton_CheckedChanged;
-            caseButton.CheckAlign = ContentAlignment.MiddleRight;
-            caseButton.Checked = true;
-
-            //Button to the edit menu
-            editButton.Text = "Edit Wordpool";
-            editButton.SetBounds(10, 300, 70, 20);
-            editButton.Click += EditButton_Click;
 
             Controls.Add(directionBox);
             Controls.Add(shuffleBox);
             Controls.Add(caseButton);
-            Controls.Add(editButton);
 
             Application.Run(this);
-        }
-
-        private void EditButton_Click(object sender, EventArgs e)
-        {
-            new EditFrame(items).ShowDialog();
         }
 
         private void CaseButton_CheckedChanged(object sender, EventArgs e)
@@ -151,7 +142,7 @@ namespace VocabularyLearner
 
         private void Box_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char)13) //Enter-Taste
+            if (e.KeyChar == (char)13 && enterDelay.go()) //Enter-Key und possible Delay
             {
                 switch (state) {
                     //User has put in a solution -> Result
@@ -163,6 +154,8 @@ namespace VocabularyLearner
                         drawables[Drawable.solution].setDraw(true);
                         drawables[Drawable.textTwo].setDraw(true);
                         state = state_.waitingForContinue;
+                        (new Thread(enterDelay.delayInput)).Start(400); //Sets enterDelay.acceptInput to false for 400 millis to protect the user from revealing the solution immidiately
+
                         break;
                     //User pushed continue -> Generate new word
                     case state_.waitingForContinue:
@@ -183,6 +176,7 @@ namespace VocabularyLearner
                 }
                 e.Handled = true;
                 InvokePaint(this, new PaintEventArgs(formGraphics, DisplayRectangle));
+
 
             }
         }
@@ -217,6 +211,6 @@ namespace VocabularyLearner
             formGraphics.DrawString(drawable.text, font, solidBrush, drawable.location);
         }
 
-
+        
     }
 }
